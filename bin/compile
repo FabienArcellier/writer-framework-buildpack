@@ -20,6 +20,7 @@ function main
 
   set -o nounset
 
+  pip install $1[ds]
   streamsync_apps_install $1 $2 $3
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
   cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
