@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+set -o errexit
+
+unset GIT_DIR
+
+function main
+{
+  # Export Path variables, for use in sub-scripts.
+  BIN_DIR=$(cd "$(dirname "$0")"; pwd) # absolute path
+  ROOT_DIR=$(dirname "$BIN_DIR")
+  BUILD_DIR=$1
+  CACHE_DIR=$2
+  ENV_DIR=$3
+
+  export BUILD_DIR CACHE_DIR ENV_DIR ROOT_DIR BIN_DIR
+
+  buildpack_process $1 $2 $3 https://github.com/FabienArcellier/nodejs-buildpack.git#streamsync-review
+  buildpack_process $1 $2 $3 https://github.com/FabienArcellier/python-buildpack.git#streamsync-review
+
+  set -o nounset
+
+  streamsync_apps_install $1 $2 $3
+  cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
+  cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
+  cp -r $ROOT_DIR/apps/scalingo.json $BUILD_DIR
+
+  if [ -e $1/last_pack_release.out ]; then
+    echo "Using release configuration from last framework ($framework)."
+  fi
+}
+
+function streamsync_apps_install
+{
+  echo "=====> Install Streamsync Apps"
+  for d in $1/apps/*/ ; do
+    local app_dir=$d
+    if [ -f "$app_dir/requirements.txt" ]; then
+      (cd $app_dir && pip install -r requirements.txt)
+    fi
+  done
+}
+
+function buildpack_process
+{
+  BUILDPACK=$4
+
+  dir=$(mktemp -t buildpackXXXXX)
+  rm -rf $dir
+
+  url=${BUILDPACK%#*}
+  branch=${BUILDPACK#*#}
+
+  # Remove additional \r if file created with Windows
+  url=$(echo $url | tr -d '\r')
+  branch=$(echo $branch | tr -d '\r')
+
+  if [ "$branch" == "$url" ]; then
+    branch=""
+  fi
+
+  if [ "$url" != "" ]; then
+    echo "=====> Downloading Buildpack: $url"
+
+    if [[ "$url" =~ \.tgz$ || "$url" =~ \.tar\.gz$ ]]; then
+      mkdir -p "$dir"
+      curl -s "$url" | tar xvz -C "$dir" >/dev/null 2>&1
+    else
+      git clone $url $dir >/dev/null 2>&1
+      if [ -f "$dir/.gitmodules" ]; then
+        echo "=====> Detected git submodules. Initializing..."
+        (cd $dir && git submodule update --init --recursive)
+      fi
+
+      if [ "$branch" != "" ]; then
+        echo "=====> Using branch: $branch"
+        (cd $dir && git checkout $branch >/dev/null 2>&1)
+      fi
+    fi
+    cd $dir
+
+    # we'll get errors later if these are needed and don't exist
+    chmod -f +x $dir/bin/{detect,compile,release} || true
+
+    framework=$($dir/bin/detect $1)
+
+    if [ $? == 0 ]; then
+      echo "=====> Detected Framework: $framework"
+      $dir/bin/compile $1 $2 $3
+
+      if [ $? != 0 ]; then
+        exit 1
+      fi
+
+      # check if the buildpack left behind an environment for subsequent ones
+      if [ -e $dir/export ]; then
+        source $dir/export
+      fi
+
+      if [ -x $dir/bin/release ]; then
+        $dir/bin/release $1 > $1/last_pack_release.out
+      fi
+    else
+      echo " !     Application is not compatible with the buildpack."
+      echo "       Check buildpack documentation for more information:"
+      echo "       https://doc.scalingo.com/platform/deployment/buildpacks/intro"
+    fi
+  fi
+}
+
+main "$@"
