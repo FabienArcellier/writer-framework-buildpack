@@ -25,6 +25,7 @@ function main
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
   cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
   cp -r $ROOT_DIR/apps/scalingo.json $BUILD_DIR
+  cp -r $ROOT_DIR/apps/.slugignore $BUILD_DIR
 
   if [ -e $1/last_pack_release.out ]; then
     echo "Using release configuration from last framework ($framework)."
