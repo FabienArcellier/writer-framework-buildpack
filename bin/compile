@@ -43,6 +43,13 @@ function streamsync_apps_install
   done
 }
 
+function streamsync_doc_build
+{
+  echo "=====> Build Streamsync Docs"
+  cd $ROOT_DIR/docs
+  npm run build
+}
+
 function buildpack_process
 {
   BUILDPACK=$4

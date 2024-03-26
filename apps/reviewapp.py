@@ -15,6 +15,7 @@ from typing import List
 import uvicorn
 from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, status
+from fastapi.staticfiles import StaticFiles
 
 import streamsync.serve
 
@@ -35,16 +36,17 @@ def app_path(app_name: str) -> str:
     return os.path.join(os.path.dirname(__file__), app_name)
 
 root_asgi_app = FastAPI(lifespan=streamsync.serve.lifespan)
+root_asgi_app.mount("/docs", StaticFiles(directory="docs/docs/.vitepress/dist"), name="docs")
 
 for app in list_apps():
     sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True)
     root_asgi_app.mount(f"/{app}/", sub_asgi_app)
 
 
-
 @root_asgi_app.get("/")
 async def init():
     links = [f'<li><a href="/{a}">{a}</a></li>' for a in list_apps()]
+    links += [f'<li><a href="/docs/index.html">docs</a></li>']
 
     return HTMLResponse("""
         <h1>Streamsync review app</h1>
