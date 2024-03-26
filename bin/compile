@@ -46,8 +46,7 @@ function streamsync_apps_install
 function streamsync_doc_build
 {
   echo "=====> Build Streamsync Docs"
-  cd $ROOT_DIR/docs
-  npm run build
+  cd $ROOT_DIR/docs && npm run build
 }
 
 function buildpack_process
