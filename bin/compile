@@ -18,14 +18,19 @@ function main
   buildpack_process $1 $2 $3 https://github.com/FabienArcellier/nodejs-buildpack.git#streamsync-review
   buildpack_process $1 $2 $3 https://github.com/FabienArcellier/python-buildpack.git#streamsync-review
 
+  mv $BUILD_DIR/docs/docs/.vitepress/config.ts $BUILD_DIR/docs/docs/.vitepress/config_source.ts
+  cp -r $ROOT_DIR/apps/config.ts $BUILD_DIR/docs/docs/.vitepress/config.ts
+
   set -o nounset
 
   pip install $1[ds]
   streamsync_apps_install $1 $2 $3
+  streamsync_doc_build $1 $2 $3
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
   cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
   cp -r $ROOT_DIR/apps/scalingo.json $BUILD_DIR
   cp -r $ROOT_DIR/apps/.slugignore $BUILD_DIR
+
 
   if [ -e $1/last_pack_release.out ]; then
     echo "Using release configuration from last framework ($framework)."
@@ -46,7 +51,10 @@ function streamsync_apps_install
 function streamsync_doc_build
 {
   echo "=====> Build Streamsync Docs"
-  cd $ROOT_DIR/docs && npm run build
+  cd $1/docs
+  npm install
+  npm run build
+
 }
 
 function buildpack_process
