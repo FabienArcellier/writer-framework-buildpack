@@ -39,7 +39,7 @@ def app_path(app_name: str) -> str:
     return os.path.join(os.path.dirname(__file__), app_name)
 
 root_asgi_app = FastAPI(lifespan=streamsync.serve.lifespan)
-root_asgi_app.mount("/docs", StaticFiles(directory=os.path.join(ROOT_DIR, "docs/docs/.vitepress/dist")), name="docs")
+root_asgi_app.mount("/docs", StaticFiles(directory=os.path.join(ROOT_DIR, "docs/docs/.vitepress/dist"), html=True), name="docs")
 
 for app in list_apps():
     sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True)
