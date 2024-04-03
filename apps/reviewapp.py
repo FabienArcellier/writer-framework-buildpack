@@ -119,4 +119,6 @@ uvicorn.run(root_asgi_app,
     host=HOST,
     port=PORT,
     log_level="warning",
-    ws_max_size=streamsync.serve.MAX_WEBSOCKET_MESSAGE_SIZE)
+    ws_max_size=streamsync.serve.MAX_WEBSOCKET_MESSAGE_SIZE, 
+    reload=False,
+    workers=1)
