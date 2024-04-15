@@ -15,7 +15,7 @@ function main
 
   export BUILD_DIR CACHE_DIR ENV_DIR ROOT_DIR BIN_DIR
 
-  buildpack_process $1 $2 $3 https://github.com/FabienArcellier/nodejs-buildpack.git#streamsync-review
+  buildpack_process $1 $2 $3 https://github.com/Scalingo/nodejs-buildpack.git
   buildpack_process $1 $2 $3 https://github.com/FabienArcellier/python-buildpack.git#streamsync-review
 
   mv $BUILD_DIR/docs/docs/.vitepress/config.ts $BUILD_DIR/docs/docs/.vitepress/config_source.ts
@@ -25,7 +25,9 @@ function main
 
   pip install $1[ds]
   streamsync_apps_install $1 $2 $3
+  streamsync_npm_install $1 $2 $3
   streamsync_doc_build $1 $2 $3
+  streamsync_storybook_build $1 $2 $3
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
   cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
   cp -r $ROOT_DIR/apps/scalingo.json $BUILD_DIR
@@ -48,13 +50,29 @@ function streamsync_apps_install
   done
 }
 
+function streamsync_npm_install
+{
+  echo "=====> Install npm packages and generate code"
+  cd $1
+  npm install
+  npm run codegen
+}
+
 function streamsync_doc_build
 {
   echo "=====> Build Streamsync Docs"
   cd $1/docs
   npm install
   npm run build
+}
 
+
+function streamsync_storybook_build
+{
+  echo "=====> Build Streamsync Storybook"
+  cd $1
+  npm install
+  npm run storybook.build
 }
 
 function buildpack_process
