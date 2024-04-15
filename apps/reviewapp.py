@@ -40,6 +40,7 @@ def app_path(app_name: str) -> str:
 
 root_asgi_app = FastAPI(lifespan=streamsync.serve.lifespan)
 root_asgi_app.mount("/docs", StaticFiles(directory=os.path.join(ROOT_DIR, "docs/docs/.vitepress/dist"), html=True), name="docs")
+root_asgi_app.mount("/storybook", StaticFiles(directory=os.path.join(ROOT_DIR, "src/ui/storybook-static"), html=True), name="storybook")
 
 for app in list_apps():
     sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True)
@@ -50,6 +51,7 @@ for app in list_apps():
 async def init():
     links = [f'<li><a href="/{a}">{a}</a></li>' for a in list_apps()]
     links += [f'<li><a href="/docs/index.html">docs</a></li>']
+    links += [f'<li><a href="/storybook/index.html">storybook</a></li>']
 
     return HTMLResponse("""
         <h1>Streamsync review app</h1>
