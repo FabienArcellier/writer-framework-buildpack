@@ -109,7 +109,6 @@ def check_permission(auth) -> bool:
 
     basicauth_username, basicauth_password = basicauth_part
 
-    time.sleep(1)
     if username == basicauth_username and password == basicauth_password:
         return True
     else:
