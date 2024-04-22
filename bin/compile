@@ -25,7 +25,6 @@ function main
 
   pip install $1[ds]
   streamsync_apps_install $1 $2 $3
-  streamsync_npm_install $1 $2 $3
   streamsync_doc_build $1 $2 $3
   streamsync_storybook_build $1 $2 $3
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
@@ -50,19 +49,12 @@ function streamsync_apps_install
   done
 }
 
-function streamsync_npm_install
-{
-  echo "=====> Install npm packages and generate code"
-  cd $1
-  npm install
-  npm run codegen
-}
-
 function streamsync_doc_build
 {
   echo "=====> Build Streamsync Docs"
   cd $1/docs
   npm install
+  npm run codegen
   npm run build
 }
 
