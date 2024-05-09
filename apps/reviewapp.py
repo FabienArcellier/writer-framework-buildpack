@@ -43,7 +43,7 @@ root_asgi_app.mount("/docs", StaticFiles(directory=os.path.join(ROOT_DIR, "docs/
 root_asgi_app.mount("/storybook", StaticFiles(directory=os.path.join(ROOT_DIR, "src/ui/storybook-static"), html=True), name="storybook")
 
 for app in list_apps():
-    sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True)
+    sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True, enable_server_setup=True)
     root_asgi_app.mount(f"/{app}/", sub_asgi_app)
 
 

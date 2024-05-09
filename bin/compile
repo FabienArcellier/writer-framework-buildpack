@@ -24,6 +24,7 @@ function main
   set -o nounset
 
   pip install $1[ds]
+  streamsync_apps_copy $1 $2 $3
   streamsync_apps_install $1 $2 $3
   streamsync_doc_build $1 $2 $3
   streamsync_storybook_build $1 $2 $3
@@ -36,6 +37,15 @@ function main
   if [ -e $1/last_pack_release.out ]; then
     echo "Using release configuration from last framework ($framework)."
   fi
+}
+
+function streamsync_apps_copy
+{
+  echo "=====> Copy Streamsync Apps"
+  for d in $ROOT_DIR/customapps/*/ ; do
+    local app_dir=$d
+    cp -r $app_dir $1/apps/
+  done
 }
 
 function streamsync_apps_install
