@@ -17,7 +17,7 @@ from fastapi.responses import HTMLResponse
 from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
 
-import streamsync.serve
+import writer.serve
 
 HOST = os.getenv('HOST', 'localhost')
 PORT = int(os.getenv('PORT', '8000'))
@@ -120,6 +120,6 @@ uvicorn.run(root_asgi_app,
     host=HOST,
     port=PORT,
     log_level="warning",
-    ws_max_size=streamsync.serve.MAX_WEBSOCKET_MESSAGE_SIZE, 
+    ws_max_size=writer.serve.MAX_WEBSOCKET_MESSAGE_SIZE,
     reload=False,
     workers=1)
