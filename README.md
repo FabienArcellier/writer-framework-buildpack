@@ -1,2 +1,2 @@
-# Buildpack dedicated to deploy streamsync review app on Scalingo
+# Buildpack dedicated to deploy Writer review app on Scalingo
 

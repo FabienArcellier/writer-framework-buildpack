@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-echo "Streamsync"
+echo "Writer"
 exit 0

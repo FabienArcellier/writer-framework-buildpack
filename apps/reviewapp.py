@@ -39,7 +39,6 @@ def app_path(app_name: str) -> str:
     return os.path.join(os.path.dirname(__file__), app_name)
 
 root_asgi_app = FastAPI(lifespan=streamsync.serve.lifespan)
-root_asgi_app.mount("/docs", StaticFiles(directory=os.path.join(ROOT_DIR, "docs/docs/.vitepress/dist"), html=True), name="docs")
 root_asgi_app.mount("/storybook", StaticFiles(directory=os.path.join(ROOT_DIR, "src/ui/storybook-static"), html=True), name="storybook")
 
 for app in list_apps():
@@ -50,7 +49,6 @@ for app in list_apps():
 @root_asgi_app.get("/")
 async def init():
     links = [f'<li><a href="/{a}">{a}</a></li>' for a in list_apps()]
-    links += [f'<li><a href="/docs/index.html">docs</a></li>']
     links += [f'<li><a href="/storybook/index.html">storybook</a></li>']
 
     return HTMLResponse("""

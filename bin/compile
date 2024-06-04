@@ -16,17 +16,13 @@ function main
   export BUILD_DIR CACHE_DIR ENV_DIR ROOT_DIR BIN_DIR
 
   buildpack_process $1 $2 $3 https://github.com/Scalingo/nodejs-buildpack.git
-  buildpack_process $1 $2 $3 https://github.com/FabienArcellier/python-buildpack.git#streamsync-review
-
-  mv $BUILD_DIR/docs/docs/.vitepress/config.ts $BUILD_DIR/docs/docs/.vitepress/config_source.ts
-  cp -r $ROOT_DIR/apps/config.ts $BUILD_DIR/docs/docs/.vitepress/config.ts
+  buildpack_process $1 $2 $3 https://github.com/FabienArcellier/python-buildpack.git#writer-review
 
   set -o nounset
 
   pip install $1[ds]
   streamsync_apps_copy $1 $2 $3
   streamsync_apps_install $1 $2 $3
-  streamsync_doc_build $1 $2 $3
   streamsync_storybook_build $1 $2 $3
   cp -r $ROOT_DIR/apps/Procfile $BUILD_DIR
   cp -r $ROOT_DIR/apps/reviewapp.py $BUILD_DIR/apps/reviewapp.py
@@ -41,7 +37,7 @@ function main
 
 function streamsync_apps_copy
 {
-  echo "=====> Copy Streamsync Apps"
+  echo "=====> Copy Writer Apps"
   for d in $ROOT_DIR/customapps/*/ ; do
     local app_dir=$d
     cp -r $app_dir $1/apps/
@@ -50,7 +46,7 @@ function streamsync_apps_copy
 
 function streamsync_apps_install
 {
-  echo "=====> Install Streamsync Apps"
+  echo "=====> Install Writer Apps"
   for d in $1/apps/*/ ; do
     local app_dir=$d
     if [ -f "$app_dir/requirements.txt" ]; then
@@ -59,19 +55,9 @@ function streamsync_apps_install
   done
 }
 
-function streamsync_doc_build
-{
-  echo "=====> Build Streamsync Docs"
-  cd $1/docs
-  npm install
-  npm run codegen
-  npm run build
-}
-
-
 function streamsync_storybook_build
 {
-  echo "=====> Build Streamsync Storybook"
+  echo "=====> Build Writer Storybook"
   cd $1
   npm install
   npm run storybook.build
