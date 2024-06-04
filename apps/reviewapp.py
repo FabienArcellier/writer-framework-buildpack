@@ -38,11 +38,11 @@ def list_apps() -> List[str]:
 def app_path(app_name: str) -> str:
     return os.path.join(os.path.dirname(__file__), app_name)
 
-root_asgi_app = FastAPI(lifespan=streamsync.serve.lifespan)
+root_asgi_app = FastAPI(lifespan=writer.serve.lifespan)
 root_asgi_app.mount("/storybook", StaticFiles(directory=os.path.join(ROOT_DIR, "src/ui/storybook-static"), html=True), name="storybook")
 
 for app in list_apps():
-    sub_asgi_app = streamsync.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True, enable_server_setup=True)
+    sub_asgi_app = writer.serve.get_asgi_app(app_path(app), "edit", enable_remote_edit=True, enable_server_setup=True)
     root_asgi_app.mount(f"/{app}/", sub_asgi_app)
 
 
@@ -52,7 +52,7 @@ async def init():
     links += [f'<li><a href="/storybook/index.html">storybook</a></li>']
 
     return HTMLResponse("""
-        <h1>Streamsync review app</h1>
+        <h1>Writer review app</h1>
         <ul>
         """ + "\n".join(links) + """
         </ul>
