@@ -31,7 +31,7 @@ def list_apps() -> List[str]:
     apps_dir = os.path.join(os.path.dirname(__file__))
     apps = []
     for d in os.listdir(apps_dir):
-        if os.path.isdir(os.path.join(apps_dir, d)) and os.path.isfile(os.path.join(apps_dir, d, 'ui.json')):
+        if os.path.isdir(os.path.join(apps_dir, d)) and os.path.isdir(os.path.join(apps_dir, d, '.wf')):
             apps.append(d.strip('/'))
     return sorted(apps)
 
